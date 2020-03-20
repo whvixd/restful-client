@@ -59,7 +59,7 @@
         <slf4j.version>1.7.20</slf4j.version>
         <aspectj.version>1.8.7</aspectj.version>
         <mysql-connector-java.version>5.1.6</mysql-connector-java.version>
-        <jackson-databind.version>2.7.3</jackson-databind.version>
+        <jackson-databind.version>2.9.10.3</jackson-databind.version>
         <WebCollector.version>2.71</WebCollector.version>
         <rocketmq.version>3.2.6</rocketmq.version>
         <fastjson.version>1.2.35</fastjson.version>
