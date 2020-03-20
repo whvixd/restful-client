@@ -1,5 +1,8 @@
 package com.github.restful.client.model.annotation;
 
+import com.github.restful.client.core.handler.CoderHandler;
+import com.github.restful.client.core.handler.DefaultCoderHandler;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -16,4 +19,6 @@ public @interface RequestMapping {
     String path() default "127.0.0.1:8080";
 
     String message() default "";
+
+    Class<? extends CoderHandler> coder() default DefaultCoderHandler.class;
 }

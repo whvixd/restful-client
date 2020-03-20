@@ -1,5 +1,6 @@
 package com.github.restful.client.model.common;
 
+import com.github.restful.client.core.handler.CoderHandler;
 import com.github.restful.client.exception.ServerException;
 import com.github.restful.client.model.annotation.*;
 import com.github.restful.client.model.constant.Constants;
@@ -56,6 +57,11 @@ public class RequestParam {
     private Type resultType;
 
     /**
+     * 编码解析器
+     */
+    private CoderHandler coderHandler;
+
+    /**
      * 将method中被修饰的注解塞到RequestParam中
      *
      * @param method
@@ -77,45 +83,44 @@ public class RequestParam {
             throw new ServerException("ip格式错误");
         }
 
+        return doGetRequestParam(method, args, ipAndPort, requestMapping.coder());
+    }
+
+    private static RequestParam doGetRequestParam(Method method, Object[] args, String ipAndPort, Class<? extends CoderHandler> coder) {
+        RequestParam requestParam = new RequestParam();
+
         RequestGet requestGet = method.getAnnotation(RequestGet.class);
         RequestPost requestPost = method.getAnnotation(RequestPost.class);
         RequestPut requestPut = method.getAnnotation(RequestPut.class);
         RequestDelete requestDelete = method.getAnnotation(RequestDelete.class);
-        RequestParam requestParam = new RequestParam();
-        requestParam.setResultType(method.getGenericReturnType());
+
+        requestParam.setArgs(method, args);
+        requestParam.setResultType(method.getReturnType());
+        String path = null;
+
         if (Objects.nonNull(requestGet)) {
             requestParam.setRequestType(RequestType.Get);
-            requestParam.setArgs(method, args, requestParam);
-            requestParam.setUrl(StringUtil.analysisPathAndQueryParam(
-                    StringUtil.getFullUrl(ipAndPort, requestGet.path()),
-                    requestParam.getPathParam(),
-                    requestParam.getQueryParam()));
+            path = requestGet.path();
 
         } else if (Objects.nonNull(requestPost)) {
             requestParam.setRequestType(RequestType.Post);
-            requestParam.setArgs(method, args, requestParam);
-            requestParam.setUrl(StringUtil.analysisPathAndQueryParam(
-                    StringUtil.getFullUrl(ipAndPort, requestPost.path()),
-                    requestParam.getPathParam(),
-                    requestParam.getQueryParam()));
+            path = requestPost.path();
 
         } else if (Objects.nonNull(requestPut)) {
             requestParam.setRequestType(RequestType.Put);
-            requestParam.setArgs(method, args, requestParam);
-            requestParam.setUrl(StringUtil.analysisPathAndQueryParam(
-                    StringUtil.getFullUrl(ipAndPort, requestPut.path()),
-                    requestParam.getPathParam(),
-                    requestParam.getQueryParam()));
+            path = requestPut.path();
 
         } else if (Objects.nonNull(requestDelete)) {
             requestParam.setRequestType(RequestType.Delete);
-            requestParam.setArgs(method, args, requestParam);
-            requestParam.setUrl(StringUtil.analysisPathAndQueryParam(
-                    StringUtil.getFullUrl(ipAndPort, requestDelete.path()),
-                    requestParam.getPathParam(),
-                    requestParam.getQueryParam()));
+            path = requestDelete.path();
 
         }
+        requestParam.setUrl(StringUtil.analysisPathAndQueryParam(
+                StringUtil.getFullUrl(ipAndPort, path),
+                requestParam.getPathParam(),
+                requestParam.getQueryParam()));
+
+        requestParam.setCoderHandler(coder);
         return requestParam;
     }
 
@@ -127,9 +132,8 @@ public class RequestParam {
      *
      * @param method
      * @param args
-     * @param requestParam
      */
-    private void setArgs(Method method, Object[] args, RequestParam requestParam) {
+    private void setArgs(Method method, Object[] args) {
         Parameter[] parameters = method.getParameters();
         if (parameters.length == 0 || args.length == 0) {
             return;
@@ -141,16 +145,24 @@ public class RequestParam {
             RequestBody requestBody = parameters[i].getAnnotation(RequestBody.class);
 
             if (Objects.nonNull(requestHeader) && Objects.nonNull(args[i]) && args[i] instanceof Map) {
-                requestParam.setHeaders((Map<String, String>) args[i]);
+                this.setHeaders((Map<String, String>) args[i]);
             } else if (Objects.nonNull(requestPathParam) && Objects.nonNull(args[i]) && args[i] instanceof Map) {
-                requestParam.setPathParam((Map<String, String>) args[i]);
+                this.setPathParam((Map<String, String>) args[i]);
             } else if (Objects.nonNull(requestQueryParam) && Objects.nonNull(args[i]) && args[i] instanceof Map) {
-                requestParam.setQueryParam((Map<String, String>) args[i]);
+                this.setQueryParam((Map<String, String>) args[i]);
             } else if (Objects.nonNull(requestBody) && Objects.nonNull(args[i])) {
-                requestParam.setBody(args[i]);
+                this.setBody(args[i]);
             }
         }
     }
 
+    private void setCoderHandler(Class<? extends CoderHandler> clazz) {
+        try {
+            this.coderHandler = clazz.newInstance();
+        } catch (Exception e) {
+            log.error("coderHandler instance error ", e);
+            throw new ServerException(e);
+        }
+    }
 
 }

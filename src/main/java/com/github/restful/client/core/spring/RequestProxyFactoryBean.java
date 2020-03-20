@@ -1,5 +1,6 @@
-package com.github.restful.client.core;
+package com.github.restful.client.core.spring;
 
+import com.github.restful.client.core.proxy.RequestProxy;
 import lombok.Data;
 import org.springframework.beans.factory.FactoryBean;
 
@@ -13,7 +14,7 @@ public class RequestProxyFactoryBean<T> implements FactoryBean<T> {
 
     @Override
     public T getObject() throws Exception {
-        return RequestProxy.INSTANCE.getClientProxy(clientType);
+        return RequestProxy.INSTANCE.invoke(clientType);
     }
 
     @Override
@@ -23,6 +24,6 @@ public class RequestProxyFactoryBean<T> implements FactoryBean<T> {
 
     @Override
     public boolean isSingleton() {
-        return true;
+        return false;
     }
 }

@@ -40,9 +40,9 @@ public class GsonUtil {
     /**
      * json 序列化为 对象
      *
-     * @param json json
+     * @param json  json
      * @param clazz 类型
-     * @param <T> 范型
+     * @param <T>   范型
      * @return 返回的类型
      */
     public static <T> T fromJson(String json, Class<T> clazz) {
@@ -53,12 +53,16 @@ public class GsonUtil {
         return gson.fromJson(json, type);
     }
 
+    public static <T> T fromJson(byte[] bytes, Type type) {
+        return gson.fromJson(new String(bytes), type);
+    }
+
     /**
      * json文件 序列化为 对象
      *
      * @param fileName 文件名
-     * @param clazz 类型
-     * @param <T> 范型
+     * @param clazz    类型
+     * @param <T>      范型
      * @return 返回的类型
      * @throws IOException
      */

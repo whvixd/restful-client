@@ -15,12 +15,20 @@ import java.util.List;
  */
 @UtilityClass
 public class FastJsonUtil {
-    public String toJson(Object object) {
+    public String toJsonString(Object object) {
         return JSONObject.toJSONString(object);
     }
 
-    public String toJsonWithNull(Object object) {
+    public String toJsonStringWithNull(Object object) {
         return JSONObject.toJSONString(object, SerializerFeature.WriteMapNullValue);
+    }
+
+    public byte[] toJson(Object object) {
+        return JSONObject.toJSONBytes(object);
+    }
+
+    public byte[] toJsonWithNull(Object object) {
+        return JSONObject.toJSONBytes(object, SerializerFeature.WriteMapNullValue);
     }
 
     public <T> T fromJson(String json, Class<T> clazz) {
@@ -49,6 +57,11 @@ public class FastJsonUtil {
     public <T> T fromJson(String json) {
         return JSONObject.parseObject(json, new TypeReference<T>() {
                 }.getType(),
+                Feature.SupportNonPublicField, Feature.AllowComment, Feature.InitStringFieldAsEmpty, Feature.DisableFieldSmartMatch);
+    }
+
+    public <T> T fromJson(byte[] bytes, Type type) {
+        return JSONObject.parseObject(bytes, type,
                 Feature.SupportNonPublicField, Feature.AllowComment, Feature.InitStringFieldAsEmpty, Feature.DisableFieldSmartMatch);
     }
 

@@ -1,10 +1,10 @@
-package com.github.restful.client.utils;
+package com.github.restful.client.core.proxy;
 
 import com.github.restful.client.exception.ArgValidationException;
 import com.github.restful.client.exception.ServerException;
 import com.github.restful.client.model.constant.ContentType;
 import com.github.restful.client.model.constant.TimeoutConstants;
-import lombok.experimental.UtilityClass;
+import com.github.restful.client.utils.OkHttpUtil;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -15,12 +15,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-
 /**
- * Created by wangzhx on 2018/11/6.
+ * Created by wangzhx on 2020/3/20.
  */
-@UtilityClass
-public class OkHttpUtil {
+public class OkHttpProxy {
     private static final OkHttpClient OK_HTTP_CLIENT = new OkHttpClient.Builder()
             .connectTimeout(TimeoutConstants.CONNECT_TIMEOUT, TimeUnit.SECONDS)
             .writeTimeout(TimeoutConstants.WRITE_TIMEOUT, TimeUnit.SECONDS)
@@ -28,12 +26,8 @@ public class OkHttpUtil {
             .build();
     private static final Logger log = LoggerFactory.getLogger(OkHttpUtil.class);
 
-    public String doGet(String url, Map<String, String> headers) {
-        if (StringUtils.isBlank(url)) {
-            log.error("请求url不能为空");
-            throw new ArgValidationException("url为空");
-        }
-
+    public byte[] doGet(String url, Map<String, String> headers) {
+        checkNull(url);
         Call call = OK_HTTP_CLIENT.newCall(new Request.Builder()
                 .url(url)
                 .headers(Headers.of(headers))
@@ -41,9 +35,7 @@ public class OkHttpUtil {
         try {
             Response response = call.execute();
             if (response.isSuccessful()) {
-                String result = Objects.isNull(response.body()) ? null : response.body().string();
-                log.info("url:{},headers:{},result:{}", url, FastJsonUtil.toJsonStringWithNull(headers), result);
-                return result;
+                return Objects.isNull(response.body()) ? null : response.body().bytes();
             } else {
                 log.error("doGet调用失败:code:{},message:{},url:{},headers:{}",
                         response.code(), response.message(), url, headers.toString());
@@ -51,17 +43,13 @@ public class OkHttpUtil {
             }
 
         } catch (IOException e) {
-            log.error("doGet调用失败:code:{},message:{},url:{},headers:{}", url, headers.toString());
+            log.error("doGet调用失败:url:{},headers:{}", url, headers.toString());
             throw new ServerException("doGet调用失败");
         }
     }
 
-    public String doPost(String url, Map<String, String> headers, String content) {
-        if (StringUtils.isBlank(url) || StringUtils.isBlank(content)) {
-            log.error("请求url:{}、body:{}不能为空", url, content);
-            throw new ArgValidationException("url||body为空");
-        }
-
+    public byte[] doPost(String url, Map<String, String> headers, byte[] content) {
+        checkNull(url, content);
         RequestBody body = RequestBody.create(MediaType.parse(ContentType.APPLICATION_JSON), content);
         Call call = OK_HTTP_CLIENT.newCall(new Request.Builder()
                 .url(url)
@@ -71,9 +59,7 @@ public class OkHttpUtil {
         try {
             Response response = call.execute();
             if (response.isSuccessful()) {
-                String result = Objects.isNull(response.body()) ? null : response.body().string();
-                log.info("url:{},headlers:{},arg:{},result:{}", url, FastJsonUtil.toJsonStringWithNull(headers), content, result);
-                return result;
+                return Objects.isNull(response.body()) ? null : response.body().bytes();
             } else {
                 log.error("doPost调用失败:code:{},message:{},url:{},headers:{},body:{}",
                         response.code(), response.message(), url, headers.toString(), content);
@@ -86,11 +72,8 @@ public class OkHttpUtil {
         }
     }
 
-    public String doPut(String url, Map<String, String> headers, String content) {
-        if (StringUtils.isBlank(url) || StringUtils.isBlank(content)) {
-            log.error("请求url:{}、body:{}不能为空", url, content);
-            throw new ArgValidationException("url||body为空");
-        }
+    public byte[] doPut(String url, Map<String, String> headers, byte[] content) {
+        checkNull(url, content);
         RequestBody body = RequestBody.create(MediaType.parse(ContentType.APPLICATION_JSON), content);
         Call call = OK_HTTP_CLIENT.newCall(new Request.Builder()
                 .url(url)
@@ -100,9 +83,7 @@ public class OkHttpUtil {
         try {
             Response response = call.execute();
             if (response.isSuccessful()) {
-                String result = Objects.isNull(response.body()) ? null : response.body().string();
-                log.info("url:{},headlers:{},arg:{},result:{}", url, FastJsonUtil.toJsonStringWithNull(headers), content, result);
-                return result;
+                return Objects.isNull(response.body()) ? null : response.body().bytes();
             } else {
                 log.error("doPut调用失败:code:{},message:{},url:{},headers:{},body:{}",
                         response.code(), response.message(), url, headers.toString(), content);
@@ -114,11 +95,8 @@ public class OkHttpUtil {
         }
     }
 
-    public String doDelete(String url, Map<String, String> headers, String content) {
-        if (StringUtils.isBlank(url) || StringUtils.isBlank(content)) {
-            log.error("请求url:{}、body:{}不能为空", url, content);
-            throw new ArgValidationException("url||body为空");
-        }
+    public byte[] doDelete(String url, Map<String, String> headers, byte[] content) {
+        checkNull(url, content);
         RequestBody body = RequestBody.create(MediaType.parse(ContentType.APPLICATION_JSON), content);
         Call call = OK_HTTP_CLIENT.newCall(new Request.Builder()
                 .url(url)
@@ -128,9 +106,7 @@ public class OkHttpUtil {
         try {
             Response response = call.execute();
             if (response.isSuccessful()) {
-                String result = Objects.isNull(response.body()) ? null : response.body().string();
-                log.info("url:{},headlers:{},arg:{},result:{}", url, FastJsonUtil.toJsonStringWithNull(headers), content, result);
-                return result;
+                return Objects.isNull(response.body()) ? null : response.body().bytes();
             } else {
                 log.error("doDelete调用失败:code:{},message:{},url:{},headers:{},body:{}",
                         response.code(), response.message(), url, headers.toString(), content);
@@ -139,6 +115,20 @@ public class OkHttpUtil {
         } catch (IOException e) {
             log.error("doDelete调用失败,url:{},headers:{},body:{}", url, headers.toString(), content);
             throw new ServerException("doDelete调用失败");
+        }
+    }
+
+    private void checkNull(String url, byte[] content) {
+        if (StringUtils.isBlank(url) || content.length == 0) {
+            log.error("请求url:{}、body:{}不能为空", url, content);
+            throw new ArgValidationException("url||body为空");
+        }
+    }
+
+    private void checkNull(String url) {
+        if (StringUtils.isBlank(url)) {
+            log.error("请求url:{},不能为空", url);
+            throw new ArgValidationException("url|");
         }
     }
 }

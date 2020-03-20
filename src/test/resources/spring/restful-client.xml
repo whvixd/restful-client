@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="helloClient" class="com.github.restful.client.core.RequestProxyFactoryBean"
-          p:clientType="com.github.restful.client.core.RequestInvokeDemo.HelloClient"/>
+    <bean id="helloClient" class="com.github.restful.client.core.spring.RequestProxyFactoryBean"
+          p:clientType="com.github.restful.client.core.RequestInvokeTest.HelloClient"/>
 
 </beans>
