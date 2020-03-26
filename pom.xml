@@ -6,7 +6,7 @@
 
     <groupId>com.github.whvixd</groupId>
     <artifactId>restful-client</artifactId>
-    <version>1.0</version>
+    <version>1.0.RELEASE</version>
 
     <name>restful-client</name>
     <url>https://github.com/whvixd/restful-client</url>
