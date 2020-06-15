@@ -384,7 +384,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-handler</artifactId>
-            <version>4.1.5.Final</version>
+            <version>4.1.46.Final</version>
             <exclusions>
                 <exclusion>
                     <artifactId>netty-buffer</artifactId>
