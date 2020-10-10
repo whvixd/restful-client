@@ -45,6 +45,6 @@ public class StringUtilTest {
 
     @Test
     public void testCheckUrl() {
-        Assert.assertTrue(StringUtil.checkUrl(""));
+        Assert.assertFalse(StringUtil.checkUrl(""));
     }
 }
