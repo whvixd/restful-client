@@ -70,7 +70,7 @@
         <jackson-databind.version>2.9.10.5</jackson-databind.version>
         <WebCollector.version>2.71</WebCollector.version>
         <rocketmq.version>3.2.6</rocketmq.version>
-        <fastjson.version>1.2.35</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <httpclient.version>4.5.1</httpclient.version>
         <javax.el.version>3.0.1-b08</javax.el.version>
         <javax.ws.rs-api.version>2.0</javax.ws.rs-api.version>
