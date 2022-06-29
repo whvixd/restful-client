@@ -57,7 +57,7 @@
         <junit.version>4.12</junit.version>
         <spring.version>5.2.4.RELEASE</spring.version>
         <commons-lang3.version>3.4</commons-lang3.version>
-        <commons-email.version>1.4</commons-email.version>
+        <commons-email.version>1.5</commons-email.version>
         <guava.version>29.0-jre</guava.version>
         <jsr305.version>3.0.1</jsr305.version>
         <cglib.version>2.2.2</cglib.version>
